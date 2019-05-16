@@ -23,9 +23,9 @@ def find_location_geo(text):
     return GeoText(text).cities   
 
 
-def filter_locations(book_locations,locations):
-
-    return [i for i in book_locations if i in locations]
+def filter_locations(book_locations,df):       
+    
+    return [df[df.asciiname == i].iloc[0].geonameid for i in book_locations if i in list(df.asciiname)]
 
 
 labels = ["geonameid", "name", "asciiname", "alternatenames",'latitude',
@@ -34,12 +34,14 @@ labels = ["geonameid", "name", "asciiname", "alternatenames",'latitude',
 
 df = pd.read_csv('./cities15000.txt', sep='\t',names = (labels))
 
-df = df[['asciiname','latitude','longitude']]
+df = df[['geonameid','asciiname','latitude','longitude']]
 
 path_2_file = './files_small/10.txt'
 
 book_locations = []
 with open(path_2_file) as fp: 
     book_locations = find_location_geo(str(fp.readlines()))
-    
-print(set(filter_locations(book_locations,list(df.asciiname))))
+
+locations = filter_locations(book_locations,df)
+#print(df[df.asciiname == 'Of'].geonameid)
+print(set(locations))
