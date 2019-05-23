@@ -24,11 +24,11 @@ Obviusly all the the files mentioned in the SQL queries need to be on your syste
 CREATE TABLE `book_titles` (
   `book_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
 ```
-load data local infile '/work/soft2019spring-databases/exam/titles.csv' into table titles COLUMNS terminated by '"';
+load data local infile '/work/soft2019spring-databases/exam/titles.csv' into table book_titles COLUMNS terminated by '"';
 ```
 
 ## Book cities
@@ -92,3 +92,56 @@ CREATE TABLE `cities` (
 load data local infile '/work/soft2019spring-databases/exam/cities5000.txt' into table cities character set utf8mb4 fields terminated by '\t';
 ```
 
+## Foreign keys, indexes & fixes
+
+```sql 
+update authors set last_name = null where last_name = '';
+update authors set first_name = null where first_name = '';
+
+create unique index book_titles_book_id_index on book_titles(book_id);
+-- TODO give authors a primary key?
+create index authors_book_id_index on authors(book_id);
+
+alter table book_cities add foreign key (book_id) references book_titles(book_id) on delete cascade;
+alter table book_cities add foreign key (city_id) references cities(geonameid) on delete cascade;
+```
+
+## Exporting as JSON(input for mongo)
+
+```sql
+select 
+    json_object(
+        'book_id', book_titles_with_authors.book_id, 
+        'cities', if(group_concat(cities.asciiname) is not null, json_arrayagg(cities.asciiname), json_array()), 
+        'authors', book_titles_with_authors.authors, 
+        'authors_org', book_titles_with_authors.authors_org
+    ) as book_data 
+from 
+    (
+        select 
+            book_titles.*,json_arrayagg(authors.name) as authors_org, 
+            if(group_concat(first_name) is not null and group_concat(last_name) is not null, json_arrayagg(concat(authors.first_name,' ', authors.last_name)), 
+            json_arrayagg(authors.name)) as authors 
+        from 
+            book_titles 
+        left join authors on authors.book_id = book_titles.book_id 
+        group by book_titles.book_id
+    ) as book_titles_with_authors 
+left join 
+    book_cities on book_cities.book_id = book_titles_with_authors.book_id 
+left join 
+    cities on cities.geonameid = book_cities.city_id 
+group by 
+    book_titles_with_authors.book_id 
+into outfile '/var/lib/mysql-files/book_data5';
+```
+
+
+# MongoDB
+
+## Importing data
+
+To import data use the query from MySQL section to generate a mysql dump. Then use some text editor to replace `\\"` characters to `\"` and finally run command below, changing database, collection and file names as necessary. 
+```bash
+mongoimport --db db_exam --collection books --file soft2019spring-databases/exam/book_data5
+```
