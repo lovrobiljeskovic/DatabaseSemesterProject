@@ -16,6 +16,7 @@ This script extracts information about the books from the offline catalog. Chang
 
 # Importing data
 
+Obviusly all the the files mentioned in the SQL queries need to be on your system.
 
 ## Titles
 
@@ -34,9 +35,15 @@ load data local infile '/work/soft2019spring-databases/exam/titles.csv' into tab
 
 ```
 CREATE TABLE `book_cities` (
+  `id` int auto_increment not null,
   `book_id` int(11) NOT NULL,
-  `city_id` int(11) NOT NULL
+  `city_id` int(11) NOT NULL,
+  primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
+
+```
+load data local infile '/work/soft2019spring-databases/exam/book_cities.csv' into table book_cities fields terminated by ',' (book_id, city_id);
 ```
 
 ## Authors
@@ -44,11 +51,12 @@ CREATE TABLE `book_cities` (
 ```
 CREATE TABLE `authors` (
   `book_id` int(11) NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
-  `first_name` varchar(45) DEFAULT NULL,
-  `last_name` varchar(45) DEFAULT NULL
+  `name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
+<<<<<<< HEAD
 
 ## Cities
 
@@ -75,4 +83,9 @@ CREATE TABLE `cities` (
   `modification date` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`geonameid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+=======
+
+```
+load data local infile '/work/soft2019spring-databases/exam/authors.csv' into table authors fields terminated by ',' enclosed by '"';
+>>>>>>> 2a8292df49b013fad0502379b511d923e390f770
 ```
