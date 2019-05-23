@@ -34,10 +34,15 @@ load data local infile '/work/soft2019spring-databases/exam/titles.csv' into tab
 
 ```
 CREATE TABLE `book_cities` (
+  `id` int auto_increment not null,
   `book_id` int(11) NOT NULL,
   `city_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`book_id`)
+  primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
+
+```
+load data local infile '/work/soft2019spring-databases/exam/book_cities.csv' into table book_cities fields terminated by ',' (book_id, city_id);
 ```
 
 ## Authors
