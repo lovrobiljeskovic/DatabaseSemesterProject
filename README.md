@@ -89,25 +89,6 @@ CREATE TABLE `cities` (
 ```
 
 ```
-load data local infile '/work/soft2019spring-databases/exam/cities5000.txt' into table cities character set utf8mb4 fields terminated by '\t' (
-    city_id,
-    name,
-    ascii_name,
-    alternate_names,
-    latitude_str,
-    longitude_str,
-    feature_class,
-    feature_code,
-    country_code,
-    cc2,
-    @dummy,
-    @dummy,
-    @dummy,
-    @dummy,
-    population,
-    elevation,
-    @dummy,
-    timezone,
-    modification_date
-);
+load data local infile '/work/soft2019spring-databases/exam/cities5000.txt' into table cities character set utf8mb4 fields terminated by '\t';
 ```
+
