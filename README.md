@@ -36,7 +36,7 @@ load data local infile '/work/soft2019spring-databases/exam/titles.csv' into tab
 CREATE TABLE `book_cities` (
   `id` int auto_increment not null,
   `book_id` int(11) NOT NULL,
-  `city_id` int(11) DEFAULT NULL,
+  `city_id` int(11) NOT NULL,
   primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
@@ -48,9 +48,11 @@ load data local infile '/work/soft2019spring-databases/exam/book_cities.csv' int
 ## Authors
 
 ```
-CREATE TABLE `titles` (
+CREATE TABLE `authors` (
   `book_id` int(11) NOT NULL,
-  `title` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`book_id`)
+  `name` varchar(45) DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 ```
