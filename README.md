@@ -62,24 +62,30 @@ load data local infile '/work/soft2019spring-databases/exam/authors.csv' into ta
 ```
 
 ## Cities
+
 ```
-CREATE TABLE IF NOT EXISTS `cities` (
-    `city_id` int(11) NOT NULL,
-    `name` VARCHAR(255) not null,
-    `ascii_name` varchar(255) not null,
-    `alternate_names` text null,
-    latitude_str varchar(255) not null,
-    longitude_str varchar(255) not null,
-    `feature_class` char(1) null,
-    `feature_code` varchar(10) null,
-    `country_code` char(2) null,
-    `cc2` varchar(200) null,
-    `population` bigint null,
-    `elevation` int null,
-    `timezone` varchar(40) null,
-    `modification_date` varchar(255) null,
-    primary key(city_id)
-);
+CREATE TABLE `cities` (
+  `geonameid` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `asciiname` varchar(255) DEFAULT NULL,
+  `alternatenames` varchar(255) DEFAULT NULL,
+  `latitude` varchar(255) DEFAULT NULL,
+  `longitude` varchar(255) DEFAULT NULL,
+  `feature class` varchar(255) DEFAULT NULL,
+  `feature code` varchar(255) DEFAULT NULL,
+  `country code` varchar(255) DEFAULT NULL,
+  `cc2` varchar(255) DEFAULT NULL,
+  `admin1 code` varchar(255) DEFAULT NULL,
+  `admin2 code` varchar(255) DEFAULT NULL,
+  `admin3 code` varchar(255) DEFAULT NULL,
+  `admin4 code` varchar(255) DEFAULT NULL,
+  `population` varchar(255) DEFAULT NULL,
+  `elevation` varchar(255) DEFAULT NULL,
+  `dem` varchar(255) DEFAULT NULL,
+  `timezone` varchar(255) DEFAULT NULL,
+  `modification date` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`geonameid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
 ```
@@ -105,4 +111,3 @@ load data local infile '/work/soft2019spring-databases/exam/cities5000.txt' into
     modification_date
 );
 ```
-
