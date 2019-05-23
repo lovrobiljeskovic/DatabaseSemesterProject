@@ -43,9 +43,11 @@ CREATE TABLE `book_cities` (
 ## Authors
 
 ```
-CREATE TABLE `titles` (
+CREATE TABLE `authors` (
   `book_id` int(11) NOT NULL,
-  `title` varchar(45) DEFAULT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `authorscol` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`book_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
