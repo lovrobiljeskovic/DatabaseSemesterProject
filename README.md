@@ -20,8 +20,8 @@ This script extracts information about the books from the offline catalog. Chang
 ## Titles
 
 ```
-CREATE TABLE `titles` (
-  `bookId` int(11) NOT NULL,
+CREATE TABLE `book_titles` (
+  `book_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
