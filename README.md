@@ -48,5 +48,31 @@ CREATE TABLE `authors` (
   `first_name` varchar(45) DEFAULT NULL,
   `last_name` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
 
+## Cities
+
+```
+CREATE TABLE `cities` (
+  `geonameid` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `asciiname` varchar(255) DEFAULT NULL,
+  `alternatenames` varchar(255) DEFAULT NULL,
+  `latitude` varchar(255) DEFAULT NULL,
+  `longitude` varchar(255) DEFAULT NULL,
+  `feature class` varchar(255) DEFAULT NULL,
+  `feature code` varchar(255) DEFAULT NULL,
+  `country code` varchar(255) DEFAULT NULL,
+  `cc2` varchar(255) DEFAULT NULL,
+  `admin1 code` varchar(255) DEFAULT NULL,
+  `admin2 code` varchar(255) DEFAULT NULL,
+  `admin3 code` varchar(255) DEFAULT NULL,
+  `admin4 code` varchar(255) DEFAULT NULL,
+  `population` varchar(255) DEFAULT NULL,
+  `elevation` varchar(255) DEFAULT NULL,
+  `dem` varchar(255) DEFAULT NULL,
+  `timezone` varchar(255) DEFAULT NULL,
+  `modification date` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`geonameid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
