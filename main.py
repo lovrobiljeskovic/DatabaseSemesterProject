@@ -1,11 +1,7 @@
-import nltk
-from nltk.tag.stanford import StanfordNERTagger
 from geotext import GeoText
 import pandas as pd
-
-jar = './stanford-ner.jar'
-model = './english.all.3class.distsim.crf.ser.gz'
-ner_tagger = StanfordNERTagger(model, jar, encoding='utf8')
+import os
+from os.path import isfile, join
 
 def find_locations(text,ner_tagger):
 
@@ -32,16 +28,34 @@ labels = ["geonameid", "name", "asciiname", "alternatenames",'latitude',
           'longitude','feature class','feature code','country code','cc2','admin1 code','admin2 code',
          'admin3 code','admin4 code','population','elevation','dem','timezone','modification date']
 
-df = pd.read_csv('./cities15000.txt', sep='\t',names = (labels))
+df = pd.read_csv('./../cities5000.txt', sep='\t',names = (labels))
 
 df = df[['geonameid','asciiname','latitude','longitude']]
 
-path_2_file = './files_small/10.txt'
+# Change this to point to the directory for RDF folders
+bookFolder="../files/"
 
-book_locations = []
-with open(path_2_file) as fp: 
-    book_locations = find_location_geo(str(fp.readlines()))
+bookPaths = [bookFolder + f for f in os.listdir(bookFolder) if isfile(bookFolder + f)]
 
-locations = filter_locations(book_locations,df)
-#print(df[df.asciiname == 'Of'].geonameid)
-print(set(locations))
+
+with open("book_cities.csv", "w") as outputFile:
+    outputFile.write("bookId,geonameId\n")
+    for bookPath in bookPaths:
+        print("bookPath:" + str(bookPath))
+        try :
+            with open(bookPath, 'r') as bookContentFile:
+                parts = bookPath.split("/")
+                fileName = parts[-1]
+                parts = fileName.split(".")
+                bookId = parts[0]
+                
+                print("bookId " + str(bookId))
+                bookContent = bookContentFile.read()
+                #print(bookContent)
+                book_locations = find_location_geo(bookContent)        
+                locations = filter_locations(book_locations,df)            
+                #print(set(locations))
+                for location in set(locations):
+                    outputFile.write(bookId + "," + str(location) + "\n")
+        except Exception as e:
+            print(bookPath + " failed " + str(e))
