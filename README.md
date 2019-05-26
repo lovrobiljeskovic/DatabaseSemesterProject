@@ -5,6 +5,7 @@
 - [Exam material](https://github.com/datsoftlyngby/soft2019spring-databases/tree/master/Exam)
 - [RDF source](https://www.gutenberg.org/wiki/Gutenberg:Feeds)
 - [Cities files and description](http://download.geonames.org/export/dump/)
+- [FTP containing most data files](ftp://134.209.201.127/)
 
 ## Scripts
 
@@ -44,6 +45,12 @@ CREATE TABLE `book_cities` (
 
 ```
 load data local infile '/work/soft2019spring-databases/exam/book_cities.csv' into table book_cities fields terminated by ',' (book_id, city_id);
+```
+
+Given that this is the largest file, it also takes forever to import:
+```
+Query OK, 1662465 rows affected, 706 warnings (34 min 56.14 sec)
+Records: 1662466  Deleted: 0  Skipped: 1  Warnings: 706
 ```
 
 ## Authors
@@ -104,6 +111,9 @@ create index authors_book_id_index on authors(book_id);
 
 alter table book_cities add foreign key (book_id) references book_titles(book_id) on delete cascade;
 alter table book_cities add foreign key (city_id) references cities(geonameid) on delete cascade;
+
+alter table cities add column `location` POINT;
+update cities set `location` = ST_GeomFromText(CONCAT('POINT(', latitude, ' ', longitude, ')'), 4326);
 ```
 
 ## Exporting as JSON(input for mongo)
