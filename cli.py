@@ -33,11 +33,24 @@ class Mysql:
         input("press enter to coninute")
 
     def plot_cities_by_book_author(self, author):
-        result = self.sqlQuery("""
-                SELECT latitude, longitude, CONCAT('"', book_titles.title, '"', ' ', authors.name, book_titles.book_id, '"', cities.asciiname, '"') FROM authors 
+        names = author.split(" ")
+        query = """
+                SELECT latitude, longitude, 
+                    CONCAT('<b>Title:</b>', book_titles.title), 
+                    CONCAT('<b>Name:</b>', authors.name), 
+                    CONCAT('<b>Book id:</b>', book_titles.book_id), 
+                    CONCAT('<b>City:</b>', cities.asciiname) FROM authors 
                 INNER JOIN book_titles ON authors.book_id = book_titles.book_id 
                 INNER JOIN book_cities ON book_cities.book_id = authors.book_id
-                INNER JOIN cities ON cities.geonameid = book_cities.city_id WHERE authors.name = '""" + author + "' OR authors.first_name = '" + author + "'")
+                INNER JOIN cities ON cities.geonameid = book_cities.city_id WHERE authors.name = '""" + author + "'"
+        w = "";
+        if len(names) == 0:
+            w += " OR first_name  = '" + author + "' ";
+        elif len(names) == 2:
+            w +=  " OR (first_name = '" + names[0] + "' AND last_name = '" + names[1] + "')" 
+        query += w
+
+        result = self.sqlQuery(query)
         m = map.Map(result)
         m.open()
         input("press enter to coninute")
@@ -102,13 +115,13 @@ class Mongo:
         self.conn = self.client.db_exam.books
 
     def find_book_titles_city_name(self, city_name):
-        result = self.conn.find({ "cities": {"$elemMatch": {"name": city_name } } })
+        result = self.doQuery({ "cities": {"$elemMatch": {"name": city_name } } })
         for row in result:
             print(row["title"])
         print("\n\n")
 
     def plot_cities_by_book_titles(self, book_titles):
-        result = self.conn.find({'title': book_titles})
+        result = self.doQuery({'title': book_titles})
         
         betterResult = []
         for row in result: 
@@ -116,12 +129,12 @@ class Mongo:
                 if city["name"] is None: 
                     continue
                 betterResult.append((city["location"]["coordinates"][0], city["location"]["coordinates"][1], str(city["name"])))
-        m = map.Map(betterResult)
+        m = map.Map(betterResult, True)
         m.open()
         input("press enter to coninute")
 
     def plot_cities_by_book_author(self, author):
-        result = self.conn.find({'authors': author})
+        result = self.doQuery({'authors': author})
 
         betterResult = []
         for row in result: 
@@ -129,12 +142,12 @@ class Mongo:
                 if city["name"] is None: 
                     continue
                 betterResult.append((city["location"]["coordinates"][0], city["location"]["coordinates"][1], str(city["name"])))
-        m = map.Map(betterResult)
+        m = map.Map(betterResult, True)
         m.open()
         input("press enter to coninute")
 
     def list_books_by_city_location(self, latitude, longitude, distance = 10000):
-        result = self.conn.find(
+        result = self.doQuery(
             {"cities.location": { 
                 '$near': { 
                     '$geometry': { 
@@ -151,12 +164,17 @@ class Mongo:
             print(row["title"])
         print("\n\n")
         
-
-
+    def doQuery(self, query):
+        millis = get_millis()
+        result = self.conn.find(query)
+        print(str(get_millis() - millis) + " MS")
+        return result
 
 db = Mysql()
 
 #db.list_books_by_city_location("55.67594", "12.56553")
+#db.plot_cities_by_book_author("Charles Darwin")
+
 
 while True:
     print("1. Find book titles by city name")

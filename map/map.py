@@ -7,8 +7,8 @@ class Map:
     
     filePath = '';
 
-    def __init__(self, data):
-        dataString = self.formatData(data)
+    def __init__(self, data, flip = False):
+        dataString = self.formatData(data, flip)
         d =  os.path.abspath(os.path.dirname(__file__))
         templatePath = d + "/template.html"
         self.filePath = d + "/" + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
@@ -23,12 +23,18 @@ class Map:
     def close(self):
         os.remove(self.filePath)
 
-    def formatData(self, data):
+    def formatData(self, data, flip = False):
         s=""
         for lat,lon,*other in data:
-            comments = str("".join(other)).replace("\"", "\\\"")
-
-            s += "{c: [" + str(lat) + ", " + str(lon) + "], t: \"" + comments + "\"},"
+            comments = "\n".join([str(i) for i in other])
+            comments = comments.replace("\r", "")
+            comments = comments.replace("\n", "<br/>")
+            comments = comments.replace("\"", "\\\"")
+                
+            coords = str(lat) + ", " + str(lon)
+            if flip:
+                coords = str(lon) + ", " + str(lat)
+            s += "{c: [" + coords + "], t: \"" + comments + "\"},\n"
         return s
 
     def __del__(self):
