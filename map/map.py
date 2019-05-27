@@ -34,9 +34,3 @@ class Map:
     def __del__(self):
         self.close()
                 
-
-map = Map([
-    [55.676111, 12.568333, """It's a Copenhagen"""],
-]);
-map.open();
-input("Press enter to coninue")
