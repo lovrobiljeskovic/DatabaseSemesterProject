@@ -146,6 +146,26 @@ group by
 into outfile '/var/lib/mysql-files/book_data5';
 ```
 
+#SQL
+
+## Queries
+
+1. ```sql
+    SELECT * FROM book_titles INNER JOIN authors ON book_titles.book_id = authors.book_id
+    INNER JOIN book_cities ON book_cities.book_id = book_titles.book_id INNER JOIN cities ON cities.geonameid = book_cities.city_id 
+    WHERE cities.asciiname = ?;
+    ```
+2. ```sql
+    SELECT * FROM book_titles INNER JOIN book_cities ON book_titles.book_id = book_cities.book_id INNER JOIN cities ON cities.geonameid = book_cities.city_id WHERE book_titles.title = ?;
+    ```
+3. ```sql
+    SELECT * FROM authors INNER JOIN book_titles ON authors.book_id = book_titles.book_id INNER JOIN book_cities ON book_cities.book_id = authors.book_id
+    INNER JOIN cities ON cities.geonameid = book_cities.city_id WHERE authors.name = ? OR authors.first_name = ?;
+
+4. ```sql
+    SELECT * FROM cities INNER JOIN book_cities ON cities.geonameid = book_cities.city_id INNER JOIN book_titles ON book_titles.book_id = book_cities.book_id WHERE ST_Distance(cities.location, ?);
+    ```
+
 
 # MongoDB
 
@@ -155,3 +175,5 @@ To import data use the query from MySQL section to generate a mysql dump. Then u
 ```bash
 mongoimport --db db_exam --collection books --file soft2019spring-databases/exam/book_data5
 ```
+
+
