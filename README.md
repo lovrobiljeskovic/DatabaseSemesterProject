@@ -123,14 +123,21 @@ alter table cities change location location point not null, add spatial index(lo
 select 
     json_object(
         'book_id', book_titles_with_authors.book_id, 
-        'cities', if(group_concat(cities.asciiname) is not null, json_arrayagg(cities.asciiname), json_array()), 
-        'authors', book_titles_with_authors.authors, 
+        'title', book_titles_with_authors.book_title,
+        'cities', json_arrayagg(json_object(
+            'name',  cities.asciiname,
+            'latitude', cities.latitude,
+            'longitude', cities.longitude
+        )),
+        'authors', book_titles_with_authors.authors,
         'authors_org', book_titles_with_authors.authors_org
     ) as book_data 
 from 
     (
         select 
-            book_titles.*,json_arrayagg(authors.name) as authors_org, 
+            book_titles.book_id as book_id,
+            book_titles.title as book_title,
+            json_arrayagg(authors.name) as authors_org, 
             if(group_concat(first_name) is not null and group_concat(last_name) is not null, json_arrayagg(concat(authors.first_name,' ', authors.last_name)), 
             json_arrayagg(authors.name)) as authors 
         from 
@@ -178,3 +185,6 @@ mongoimport --db db_exam --collection books --file soft2019spring-databases/exam
 ```
 
 
+## Queries
+
+1.
