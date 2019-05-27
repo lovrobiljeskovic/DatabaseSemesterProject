@@ -5,7 +5,7 @@
 - [Exam material](https://github.com/datsoftlyngby/soft2019spring-databases/tree/master/Exam)
 - [RDF source](https://www.gutenberg.org/wiki/Gutenberg:Feeds)
 - [Cities files and description](http://download.geonames.org/export/dump/)
-- [FTP containing most data files](ftp://134.209.201.127/)
+- [FTP containing most data files](https://bit.ly/2EyCDsk)
 
 ## Scripts
 
