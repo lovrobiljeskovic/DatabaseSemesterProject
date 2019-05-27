@@ -114,6 +114,7 @@ alter table book_cities add foreign key (city_id) references cities(geonameid) o
 
 alter table cities add column `location` POINT;
 update cities set `location` = ST_GeomFromText(CONCAT('POINT(', latitude, ' ', longitude, ')'), 4326);
+alter table cities change location location point not null, add spatial index(location);
 ```
 
 ## Exporting as JSON(input for mongo)
