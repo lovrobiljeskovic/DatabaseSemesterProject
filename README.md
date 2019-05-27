@@ -126,8 +126,10 @@ select
         'title', book_titles_with_authors.book_title,
         'cities', json_arrayagg(json_object(
             'name',  cities.asciiname,
-            'latitude', cities.latitude,
-            'longitude', cities.longitude
+            'location', json_object(
+                'type', 'Point',
+                'coordinates', json_array(st_y(cities.location), st_x(cities.location))
+            )
         )),
         'authors', book_titles_with_authors.authors,
         'authors_org', book_titles_with_authors.authors_org
@@ -171,7 +173,7 @@ into outfile '/var/lib/mysql-files/book_data5';
     INNER JOIN cities ON cities.geonameid = book_cities.city_id WHERE authors.name = ? OR authors.first_name = ?;
 
 4. ```sql
-    SELECT * FROM cities INNER JOIN book_cities ON cities.geonameid = book_cities.city_id INNER JOIN book_titles ON book_titles.book_id = book_cities.book_id WHERE ST_Distance(cities.location, ?);
+    SELECT distinct(cities.asciiname), title, ST_Distance(cities.location, ST_GeomFromText(?, 4326)) as distance FROM cities INNER JOIN book_cities ON cities.geonameid = book_cities.city_id INNER JOIN book_titles ON book_titles.book_id = book_cities.book_id having distance <= ?;
     ```
 
 
@@ -185,6 +187,19 @@ mongoimport --db db_exam --collection books --file soft2019spring-databases/exam
 ```
 
 
+## Indexes, cleanup etc
+
+```
+db.books.updateMany( { "cities.0.name": { $type: 10 }, cities: { $size: 1 } },  { $set: { cities: [] } })
+
+db.books.createIndex({"cities.location": '2dsphere'})
+```
+
 ## Queries
 
 1.
+
+
+4. ```
+db.books.find({"cities.*.location": { '$near': { $geometry: { type: 'Point', coordinates: [55.67594, 12.56553]}, '$maxDistance': 5000 } }  })
+```

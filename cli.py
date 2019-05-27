@@ -1,11 +1,16 @@
 import sys
 import mysql.connector
 import pymongo
+import time
 from pymongo import MongoClient
 
 sys.path.append('./map')
 
 import map
+
+def get_millis():
+    return int(round(time.time() * 1000))
+
 
 class Mysql:
     conn = None
@@ -37,13 +42,14 @@ class Mysql:
         m.open()
         input("press enter to coninute")
 
-    def list_books_by_city_location(self, latitude, longitude):
-        f = "ST_GeomFromText('POINT(" + latitude + " " + longitude + ")', 4326)"
+    def list_books_by_city_location(self, latitude, longitude, distance = 10000):
+        f = latitude + " " + longitude
         result = self.sqlQuery("""
-            SELECT book_titles.title, cities.asciiname FROM cities 
+            SELECT distinct(cities.asciiname), title, ST_Distance(cities.location, ST_GeomFromText('POINT(""" + f + """)', 4326)) as distance 
+            FROM cities 
             INNER JOIN book_cities ON cities.geonameid = book_cities.city_id 
             INNER JOIN book_titles ON book_titles.book_id = book_cities.book_id 
-            WHERE ST_Distance(cities.location, """ + f + ")")
+            HAVING distance > 1 AND distance <= """ + str(distance))
 
         for row in result:
             print(row)
@@ -54,7 +60,6 @@ class Mysql:
         pw = 'secret'
         conn = mysql.connector.connect( host='localhost', database='db_exam',user='root', password=pw, auth_plugin='mysql_native_password')
         conn.autocommit = True
-        print("CONNECTION --" + str(conn))
         return conn
             
     def sqlQuery(self, sqlString):
@@ -63,7 +68,9 @@ class Mysql:
             if not conn.is_connected():
                 conn = rootconnect()
             cursor = conn.cursor()
+            millis = get_millis()
             cursor.execute(sqlString)
+            print(str(get_millis() - millis) + " MS")
             res = cursor.fetchall()
             return res
         except Exception as ex:
@@ -95,7 +102,7 @@ class Mongo:
         self.conn = self.client.db_exam.books
 
     def find_book_titles_city_name(self, city_name):
-        result = self.conn.find({ "cities": city_name })
+        result = self.conn.find({ "cities": {"$elemMatch": {"name": city_name } } })
         for row in result:
             print(row["title"])
         print("\n\n")
@@ -106,7 +113,9 @@ class Mongo:
         betterResult = []
         for row in result: 
             for city in row["cities"]:
-                betterResult.append((city["latitude"], city["longitude"], city["name"]))
+                if city["name"] is None: 
+                    continue
+                betterResult.append((city["location"]["coordinates"][0], city["location"]["coordinates"][1], str(city["name"])))
         m = map.Map(betterResult)
         m.open()
         input("press enter to coninute")
@@ -119,27 +128,35 @@ class Mongo:
             for city in row["cities"]:
                 if city["name"] is None: 
                     continue
-                betterResult.append((city["latitude"], city["longitude"], str(city["name"])))
+                betterResult.append((city["location"]["coordinates"][0], city["location"]["coordinates"][1], str(city["name"])))
         m = map.Map(betterResult)
         m.open()
         input("press enter to coninute")
 
-    def list_books_by_city_location(self, latitude, longitude):
-        f = "ST_GeomFromText('POINT(" + latitude + " " + longitude + ")', 4326)"
-        result = self.sqlQuery("""
-            SELECT book_titles.title, cities.asciiname FROM cities 
-            INNER JOIN book_cities ON cities.geonameid = book_cities.city_id 
-            INNER JOIN book_titles ON book_titles.book_id = book_cities.book_id 
-            WHERE ST_Distance(cities.location, """ + f + ")")
+    def list_books_by_city_location(self, latitude, longitude, distance = 10000):
+        result = self.conn.find(
+            {"cities.location": { 
+                '$near': { 
+                    '$geometry': { 
+                        'type': 'Point', 'coordinates': [float(longitude), float(latitude)]
+                    },
+                    '$maxDistance': distance, 
+                    '$minDistance': 1 
+                } 
+            }  
+        });
+
 
         for row in result:
-            print(row)
+            print(row["title"])
         print("\n\n")
         
 
 
 
-db = Mongo()
+db = Mysql()
+
+#db.list_books_by_city_location("55.67594", "12.56553")
 
 while True:
     print("1. Find book titles by city name")
