@@ -200,6 +200,50 @@ db.books.createIndex({"cities.location": '2dsphere'})
 1.
 
 
-4. ```
+4. 
+```
 db.books.find({"cities.*.location": { '$near': { $geometry: { type: 'Point', coordinates: [55.67594, 12.56553]}, '$maxDistance': 5000 } }  })
 ```
+
+
+
+
+# Benchmarking
+
+
+| Query type | value | Mongo app | MySQL app | Mongo shell | MySQL shell |
+|------------|-------|-------|-------|-------|-------|
+| Book titles by city name | Bonn | 0 | 267 MS | 0 | 80MS 
+| Book titles by city name | Tainan | 0 | 235MS | 0 | 60MS |
+| Book titles by city name | Managua | 0 | 197MS | 0 | 50MS |
+| Book titles by city name | ThisDoesntExist | 0 | 50 MS | 0 | 50MS |
+| Cities by book title |Galatians||396MS|0|50MS |0|
+| Cities by book title |The New Germany|1MS|93MS|0|70MS |
+| Cities by book title |The Black Box|0|305MS|0|50MS|
+| Cities by book title |Apologia Pro Vita Sua|0|340MS|0|70MS|
+| Cities by book title |Not Paul, But Jesus|0|204MS|0|40MS|
+| Books by author |James R. Sullivan |0|1365MS|0|70MS|
+| Books by author |Charles Darwin |0|21MS|0|80MS|
+| Books by author |John Ireland|0|166MS|0|50MS|
+| Books by author |Rosa Luxemburg |0|66MS|0|50MS|
+| Books by author |Norman Duncan |0|772MS|0|70MS|
+| Books by coordinates | 35.381288 -89.967356|-|21123MS|-|19.56S|
+| Books by coordinates | 19.475110 -98.988092 |-|19282MS|-|19.68S|
+| Books by coordinates | 45.801695 15.709844 |-|19673MS|-|19.68S|
+| Books by coordinates | 52.512958 13.651552 |-|19900MS|-|19.15S|
+| Books by coordinates | 50.054757 19.271203 |-|19547MS|-|19.16S|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
