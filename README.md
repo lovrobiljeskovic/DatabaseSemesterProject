@@ -9,6 +9,15 @@
 
 ## Scripts
 
+### cli.py
+
+This is the intro point for the project to answer the given queries. Switching between databases requires going into the script and instantiating `Mysql` or `Mongo` class. Credentials need to be changed for both, unless using default settings for Mongo.
+The script shows has four options, one for each question.
+
+### main.py
+
+Unlike the name suggests, this is not the main script. This script extracts city names from the book contents using a library called `geotext`. This library uses data from [geonames.org](http://www.geonames.org/) find city and country names in text. The extrcted names are then further filtered based on the provided `cities5000.txt` file(see link in links section).
+
 ### parse_rdfs.py
 
 This script extracts information about the books from the offline catalog. Change `bookFolder` variable inside it to point it to the RDF folder. It will produce two files `authors.csv` and `titles.csv`.
@@ -104,7 +113,7 @@ load data local infile '/work/soft2019spring-databases/exam/cities5000.txt' into
 ```sql 
 update authors set last_name = null where last_name = '';
 update authors set first_name = null where first_name = '';
-
+clea
 create unique index book_titles_book_id_index on book_titles(book_id);
 -- TODO give authors a primary key?
 create index authors_book_id_index on authors(book_id);
@@ -197,12 +206,37 @@ db.books.createIndex({"cities.location": '2dsphere'})
 
 ## Queries
 
-1.
+1. 
+```json
+{ "cities":  {
+        "$elemMatch": {"name": city_name } 
+    } 
+}
+```
 
+2. 
+```json
+{'title': book_titles}
+```
+
+3. 
+```json
+{'authors': author}
+```
 
 4. 
-```
-db.books.find({"cities.*.location": { '$near': { $geometry: { type: 'Point', coordinates: [55.67594, 12.56553]}, '$maxDistance': 5000 } }  })
+```json
+{
+    "cities.location": { 
+        '$near': { 
+            $geometry: { 
+                type: 'Point', 
+                coordinates: [55.67594, 12.56553]
+            }, 
+            '$maxDistance': 5000 
+        } 
+    }  
+}
 ```
 
 
