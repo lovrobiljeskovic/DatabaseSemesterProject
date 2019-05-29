@@ -290,9 +290,13 @@ We haven’t done data modeling in our application because we decided to use sim
 
 ## Importing data
 Importing data into MySQL consists of a few separate processes: extracting city names from Gutenbergs book files, extracting the titles and author names from RDF files and finally loading all that into a MySQL database.  
+
 The first step is accomplished using a Python library called “GeoText”, which uses data from “geonames.org” to match city and country names in text, that list is further filtered using a provided list of city names(“cities5000.txt” file). Given the 30764 book folders downloaded from project Gutenberg, the script takes over 24 hours to go through all of them. Because the script is single-threaded, the bottleneck ends up being file I/O, especially if it involves a HDD. As seen in the MySQL ERP diagram, the relation between books(book_titles) and cities is a many-to-many, therefore the script only outputs two values in a CSV format: book ID and geonameid(called city_id in the join table). The resulting file contains 1662466 rows. 
+
 Extracting book author names and titles from the RDFs files is considerably faster and involves loading an XML file and searching for predefined tag names. This script outputs two files corresponding to book_titles and authors tables. Both files use CSV format and have a “bookId” value and output 59497-59757 rows. Both numbers are larger than the number of books downloaded, which implies that either the RDF catalog may contain more or duplicate data, or not all books were downloaded.
+
 Finally, when all four files are present(3 generated ones and 1 provided), they can be loaded into MySQL using simple `LOAD DATA LOCAL INFILE` statements, see README section on importing for them. After importing data, slight modifications are made using SQL queries to  convert author name empty string to null values and to add and populate a spatial column for city locations based on their coordinates. Finally indexes and foreign keys are added to speed up querying and enforce relationships.
+
 Importing data into MongoDB relies on having imported data into MySQL. Data is prepared for use in Mongo by using MySQL JSON capabilities, see used query in the README.md file. The query performs relatively quickly given that it only needs to be run once and finished in 1-2 minutes. The generated data dump is ready to be imported into Mongo using the provided `mongoimport` command line tool. 
 
 ## Conclusions
